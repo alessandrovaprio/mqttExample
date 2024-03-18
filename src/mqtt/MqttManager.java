@@ -1,10 +1,6 @@
 package mqtt;
 
 import java.nio.charset.StandardCharsets;
-
-//import com.google.gson.Gson;
-//import com.google.gson.JsonObject;
-//import com.google.gson.JsonPrimitive;
 import org.eclipse.paho.client.mqttv3.*;
 
 /**
@@ -12,12 +8,10 @@ import org.eclipse.paho.client.mqttv3.*;
  */
 public class MqttManager implements MqttCallback {
    
-
-//    private static final Gson gson = new Gson();
     private MqttClient client;
     private boolean isConnected = false;
 
-//    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
 
     /**
      * Restituisce l'istanza di MqttManager creata in base all'URI, all'id del client e al listerner MQTT passati
@@ -25,7 +19,7 @@ public class MqttManager implements MqttCallback {
      *
      * @param uri indirizzo del server
      * @param clientId id del client
-     * @param listener listener di MQTT
+      @param queueName e' il nome della coda.
      * @return
      * @throws MqttException se la creazione fallisce
      */
@@ -41,6 +35,7 @@ public class MqttManager implements MqttCallback {
      *
      * @param uri indirizzo del server.
      * @param clientId id del client.
+     * @param queueName e' il nome della coda.
      * @throws MqttException se la configurazione fallisce.
      */
     public void connect(String uri, String clientId, String queueName) throws MqttException {
@@ -71,11 +66,11 @@ public class MqttManager implements MqttCallback {
      
 
     /**
-     * Comunica il nuovo stato di riepimento dell'aula al dispositivo IoT con id passato come parametro.
-     * L'azione non viene effettuata immediatamente, ma viene messa in una coda di elaborazione.
+     * Pubblico su una coda il messaggio che viene passato.
+     * 
      *
-     * @param id id del dispositivo
-     * @param occupancy nuovo stato di riempimento dell'aula
+     * @param queueName e' il nome della coda
+     * @param message e' il messaggio
      */
     public void postOnQueue(String queueName, String message) {
     	try {
@@ -97,8 +92,6 @@ public class MqttManager implements MqttCallback {
 
     /**
      * Viene chiamato in modo asincrono quando arriva un messaggio dal server.
-     * Se è un messaggio del tipo <code>iotbind</code>, richiama il metodo <code>bind</code>.
-     * Se è un messaggio del tipo <code>iotevents</code>, richiama il metodo <code>movement</code>.
      * Altrimenti non fa nulla.
      *
      * @param topic nome del topic del messaggio
