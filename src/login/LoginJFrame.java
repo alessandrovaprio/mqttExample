@@ -132,7 +132,7 @@ public class LoginJFrame extends JFrame implements ActionListener, KeyListener {
             try {
                 // controllo se i campi sono stati compilati, se non lo sono faccio uscire un form con errore.
                 if( usernameField == null || usernameField.getText().isEmpty()
-                    || passwordField == null || passwordField.toString().isEmpty()) {
+                    || passwordField == null || passwordField.getPassword().length == 0) {
                     login.notifyLoginError("NO user/psw provided");
                     return;
                 } 
