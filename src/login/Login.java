@@ -15,24 +15,5 @@ public class Login {
 		this.publisher= publisher;
 	}
 
-	private List<LoginListener> listeners = new ArrayList<>();
-    // Method to add listeners
-    public void addLoginListener(LoginListener listener) {
-        listeners.add(listener);
-    }
-
-	public void notifyLoginSuccess(String username) {
-        for (LoginListener listener : listeners) {
-            System.out.println("OK");
-        }
-		new ChatEvent(publisher.client, username);
-    }
-	public void notifyLoginError(String message) {
-        for (LoginListener listener : listeners) {
-            System.out.println("NO");
-        }
-		new ErrorDialog(message);
-    }
-
 	
 }
