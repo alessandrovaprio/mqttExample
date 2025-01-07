@@ -1,18 +1,12 @@
-package main;
+package mqttmain;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import login.Login;
 import login.LoginJFrame;
 import mqtt.Publisher;
 
-public class Main {
-	
-	
+public class PublisherMain {
+
 	public static void main(String[] args) {
 		Publisher p = new Publisher();
 		new LoginJFrame(p);
 	}
-	
 }

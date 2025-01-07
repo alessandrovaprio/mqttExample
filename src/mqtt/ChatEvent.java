@@ -5,38 +5,47 @@ import javax.swing.JFrame;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import mqtt.Publisher.Topic;
 
+/**
+ * Classe che estende la classe JFrame implementando la parte grafica della vista 
+ * @author Daniele Ferrando
+ * @version 1.0
+ */
 public class ChatEvent extends JFrame {
 	
 	public Button button;
 	public Button sendButton; /*Button: presenta un bottone*/
-	public Label username; /*TextField: � un oggetto che consente la modifica di una singola riga di testo*/
+	public TextField textField; /*TextField: è un oggetto che consente la modifica di una singola riga di testo*/
+	public Label username; /*Label: etichetta per posizionare il testo in un contenitore, visualizzando una singola riga di testo di sola lettura*/
 	public Label usernameLabel; /*Label: etichetta per posizionare il testo in un contenitore, visualizzando una singola riga di testo di sola lettura*/
 	public Label receivedLabel; /*Label: rappresenta l'etichetta*/
 	public Label facolta;
-	/*TextArea: � un'area multilinea in cui viene visualizzato il testo. 
-	  Pu� essere impostato per consentire la modifica o per essere di sola lettura*/
+	/*TextArea: è un'area multilinea in cui viene visualizzato il testo. 
+	  Può essere impostato per consentire la modifica o per essere di sola lettura*/
 	public TextArea messagesReceived;
 	public TextArea textToSend;
 	public Choice topics; /*Choice: presenta un menu a tendina*/
 	/*MqttClient: contiene la parte logica del protocollo per connettersi e comunicare al broker mqtt 
-	  cio� all'indirizzo 'tcp://127.0.0.1:1883'. 
-	  127.0.0.1: e' l'indirizzo locale della macchina; mentre 1883 � la porta*/
+	  cioè all'indirizzo 'tcp://127.0.0.1:1883'. 
+	  127.0.0.1: e' l'indirizzo locale della macchina; mentre 1883 è la porta*/
 	public MqttClient c;
 	
-
+	/**
+	 * Costruttore che genera la parte logica del protocollo per connettersi e comunicare al broker mqtt
+	 * @param cli
+	 * @param user
+	 */
 	public ChatEvent(MqttClient cli, String user) {
 		c=cli;
 		ActionSubscriber s = new ActionSubscriber(this);
 		c.setCallback(new Subscriber(this));
 		usernameLabel = new Label("Username");
 		usernameLabel.setBounds(10,50,170,20);
-		
 		add(usernameLabel);
 		username = new Label();
 		username.setBounds(10,70,170,20);/*setBounds(x,y,width,height): specifica la posizione e le dimensioni di un componente GUI, coordinate x,y*/
-		username.setText(null);/*setText(null): serve per settare le propriet� text a null, cio� inzialmente � vuota*/
+		username.setText(null);/*setText(null): serve per settare le proprietà text a null, cioè inzialmente è vuota*/
 		
-		// inserisco username (l'ho inserito nella finestra del login)
+		//inserisco username (l'ho inserito nella finestra del login)
 		username.setText(user);
 		username.setFont(new Font(null,Font.ITALIC,20));
 		
@@ -53,13 +62,13 @@ public class ChatEvent extends JFrame {
 		  sul contenitore. Se si chiamano setLayout(null) si possono posizionare i componenti in modo assoluto.*/
 		setLayout(null);
 		
-		/*Viene creata l'etichetta 'Facolt�' specificando le posizioni e le coordinate e infine si passa la variabile aggiungendola che � stata 
+		/*Viene creata l'etichetta 'Facoltà' specificando le posizioni e le coordinate e infine si passa la variabile aggiungendola che è stata 
 		  creata come attributo di tipo oggetto Label*/
 		facolta = new Label("Facoltà");
 		facolta.setBounds(10,94,40,20); /*setBounds(x,y,width,height): specifica la posizione e le dimensioni di un componente GUI, coordinate x,y*/
 		add(facolta);
 		
-		/*Viene creato il menu a tendina Choice specificando le posizioni e le coordinate e infine si passa la variabile aggiungendola che � stata 
+		/*Viene creato il menu a tendina Choice specificando le posizioni e le coordinate e infine si passa la variabile aggiungendola che è stata 
 		  creata come attributo di tipo oggetto Choice*/
 		topics = new Choice();
 		topics.setBounds(10,115,100,30);/*setBounds(x,y,width,height): specifica la posizione e le dimensioni di un componente GUI, coordinate x,y*/
@@ -86,7 +95,7 @@ public class ChatEvent extends JFrame {
 		messagesReceived.setEnabled(false);//disabilito per non modificare i messaggi ricevuti in chat ('Messaggi ricevuti') su casella di testo.
 		textToSend = new TextArea();
 		textToSend.setBounds(10,150,200,200);/*setBounds(x,y,width,height): specifica la posizione e le dimensioni di un componente GUI, coordinate x,y*/
-		textToSend.addKeyListener(s); /*viene eseguita una determinata azione per ricevere i messaggi inviati dall'utente*/
+		//textToSend.addKeyListener(s); /*viene eseguita una determinata azione per ricevere i messaggi inviati dall'utente*/
 		
 		//PULSANTE INVIA
 		sendButton = new Button("Invia");
