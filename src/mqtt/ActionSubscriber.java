@@ -1,13 +1,19 @@
 package mqtt;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import login.LoginJFrame;
+import mqtt.Publisher.Topic;
 
 /*ACTIONLISTENER: interfaccia dell'ascoltatore per ricevere eventi d'azione.
 Implementa l'interfaccia e l'oggetto creato
@@ -29,7 +35,11 @@ dei metodi:
  */
 public class ActionSubscriber implements ActionListener, KeyListener {
 	
-	private ChatEvent obj;
+	private final List<Subscriber> subscribers = new ArrayList<>();
+	private LoginJFrame logoutButton;
+	public ChatEvent obj;
+	/*MqttConnectOptions: contiene il set di opzioni che controllano il modo in cui il client si connette a un server per evitare
+	  che il file si spacchi*/
 	public MqttConnectOptions opts = new MqttConnectOptions();
 	
 	/**
@@ -48,16 +58,12 @@ public class ActionSubscriber implements ActionListener, KeyListener {
 		//metodo invocato quando e' stata digitata una chiave
 	}
 
-	/*metodo invocato quando si attiva il bottone Connect scrivendo il nome utente all'interno del form 'Username' e infine viene prenuto.
-	  Il pulsante INVIA si attiva solo quando l'utente scrive nella casella del messaggio.*/
 	/**
-	 * Metodo invocato quando si attiva il bottone connect scrivendo il nome utente all'interno del form username
+	 * Metodo invocato quando si attiva il bottone connect
 	 */
 	@Override
 	public void keyPressed(KeyEvent e) {
-		/*obj.button.setEnabled(!obj.textField.getText().isEmpty());
-		obj.sendButton.setEnabled(!obj.textToSend.getText().isEmpty());*/
-		//setEnabled(): e' un metodo che attiva o disattiva il pulsante, cioe' se si passa TRUE attiva; invece FALSE disattiva
+		
 	}
 
 	/**
@@ -68,42 +74,19 @@ public class ActionSubscriber implements ActionListener, KeyListener {
 		//metodo invocato quando il bottone e' stato rilasciato
 	}
 
-	/*il metodo actionPerformed() viene richiamato automaticamente ogni volta che si digita il bottone sul componente registrato.
-	  Viene invocato quando si verifica un'azione*/
 	/**
-	 * Il metodo actionPerformed() viene richiamato automaticamente ogni volta che si digita il bottone sul componente registrato.
-	   Viene invocato quando si verifica un'azione.
+	 * Il metodo actionPerformed() viene richiamato automaticamente ogni volta che si digita il bottone sul componente registrato e
+	 * viene invocato quando si verifica un'azione.
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String selectedTopic = obj.topics.getSelectedItem(); /*getSelectedItem(): restituisce l'elemento selezionato*/
 		
-		/*CONDIZIONE UNO: l'utente preme il bottone 'Connect' di cui si aprono le due textarea, quindi riguarda il 1° controllo dell'if()*/
-    	//System.out.println(e.getSource());
-		if(e.getSource() == obj.button) {
-			try {
-				/*subscribe(): metodo che si connette quando ci sono due code uguali e quindi i due client si comunicano entrambi tra loro*/
-				obj.c.subscribe(selectedTopic); /*metodo legato al client mqtt (MqttClient) sottoscrivo al topic scelto*/			
-				obj.username.setEnabled(false); //disabilito per non modificare piu' nome utente su casella di testo 'Username'.
-
-				//se non e' vuoto allora metto un piccolo separatore (vuol dire che cambio facolta' e devo ricevere tutto)
-				if(obj.messagesReceived!=null && !obj.messagesReceived.toString().isEmpty()) { 
-					obj.messagesReceived.append("--------------------------------------" +System.lineSeparator()); 
-					//obj.messagesReceived.append(System.lineSeparator());
-				}
-				obj.add(obj.textToSend);/*L'utente invia i messaggi di chat al destinatario*/
-				obj.add(obj.messagesReceived);/*riceve messaggi inviati dall'utente sulla textarea dei messaggi ricevuti*/
-				obj.add(obj.sendButton);/*L'utente invia i messaggi di chat al destinatario tramite il pulsante INVIA*/
-			}
-			catch(MqttException e1) {
-				e1.printStackTrace();
-			}
-		}
 		
 		/*CONDIZIONE DUE: l'utente preme il bottone 'INVIA', quindi riguarda il 2° controllo dell'if() che permette di inviare e pubblicare 
   	  	  i messaggi nella textarea dei 'messaggi ricevuti'*/
   	    /*getSource(): restituisce l'oggetto su cui si e' verificato l'evento confrontandolo con il pulsante per inviare i messaggi
-  	      aprendo la chat sui messaggi ricevuti e scrivendoli*/
+  	      aprendo la chat sui messaggi ricevuti e scrivendoli*/ 
 		if(e.getSource() == obj.sendButton) {
 			try {
 				
@@ -119,12 +102,46 @@ public class ActionSubscriber implements ActionListener, KeyListener {
 				MqttMessage msg = new MqttMessage(m.getBytes(StandardCharsets.UTF_8));
 				/*il metodo PUBLISH pubblica su una coda con i parametri publish(nome della mia coda, messaggio che voglio pubblicare),
   			      quindi in 'selectedTopic' ho la coda in cui voglio pubblicare, mentre in 'msg' il messaggio*/
+				if(!obj.c.isConnected()) {
+					obj.c.connect(opts);
+				}
 				obj.c.publish(selectedTopic, msg);
+											
+				
 				obj.textToSend.setText(null);//pulisco dopo aver pubblicato sulla coda
 			}
 			catch(MqttException e1) {
 				e1.printStackTrace();
 			}
 		}
+		if(e.getSource() == obj.logoutButton) {
+            try {
+                
+                obj.setVisible(false); //chiudo il frame corrente
+                for(Topic t : Topic.values()) {
+					try {
+						obj.c.unsubscribe(t.name());
+					} catch (Exception e2) {
+						e2.printStackTrace();
+					}
+				}
+                //e' andato a buon fine e apriro' il form successivo
+                new LoginJFrame(null);
+            }
+            /*catch(MqttException cEx) {
+            	this.login.error.setText("Connessione fallita: " +cEx.getMessage());
+                this.login.error.setVisible(true);
+            }*/
+            catch(Exception e1) { //secondo catch(): serve ad evitare di spaccare il file in caso di eccezioni diverse
+            	System.out.println("Errore: " +e1.getMessage());
+            	this.logoutButton.error.setText("Errore: " +e1.getMessage());
+                this.logoutButton.error.setVisible(true);
+                e1.printStackTrace();
+            }
+        }
+	}
+	
+	public void subscribe(Subscriber subscriber) {
+		subscribers.add(subscriber);
 	}
 }

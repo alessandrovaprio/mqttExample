@@ -3,9 +3,10 @@ package mqtt;
 import java.awt.event.ActionEvent;
 import java.nio.charset.StandardCharsets;
 import org.eclipse.paho.client.mqttv3.*;
+import java.util.*;
 
 /**
- * Classe che implementa l'interfaccia e l'oggetto creato del protocollo di messaggistica MqttCallback
+ * Classe che genera eventi inviando i messaggi a un topic, e tutti i subscriber registrati ricevono quei messaggi 
  * @author Daniele Ferrando
  * @version 1.0
  */
@@ -14,8 +15,8 @@ public class Publisher {
 	public enum Topic {INFORMATICA,CHIMICA,BIOLOGIA,MATEMATICA,FISICA,ECONOMIA,FILOSOFIA}; //tipo enumeratore
 	
 	/*MqttClient: contiene la parte logica del protocollo per connettersi e comunicare al broker mqtt 
-	  cioÃ¨ all'indirizzo 'tcp://127.0.0.1:1883'. 
-	  127.0.0.1: e' l'indirizzo locale della macchina; mentre 1883 Ã¨ la porta*/
+	  cioè all'indirizzo 'tcp://127.0.0.1:1883'. 
+	  127.0.0.1: e' l'indirizzo locale della macchina; mentre 1883 è la porta*/
 	public MqttClient client;
 	
 	/**
@@ -23,7 +24,7 @@ public class Publisher {
 	 * dell'utente corrente 
 	 */
 	public Publisher() {
-		/*Indirizzo del broker MQTT; 127.0.0.1: e' l'indirizzo locale della macchina; mentre 1883 Ã¨ la porta*/
+		/*Indirizzo del broker MQTT; 127.0.0.1: e' l'indirizzo locale della macchina; mentre 1883 è la porta*/
 		//String brokerURL = "tcp://127.0.0.1:1883";
 		
 		/*ritorna e genera un identificatore client in modo casuale in base al login dell'utente corrente*/ 
