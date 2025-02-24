@@ -121,13 +121,16 @@ public class ActionSubscriber implements ActionListener, KeyListener {
             try {
                 
                 obj.setVisible(false); //chiudo il frame corrente
-                for(Topic t : Topic.values()) {
+				// giro tutte i TOPIC ancora selezionati e mi disconnetto
+				for(int i =0;i< obj.selectedTopics.size();i++){
 					try {
-						obj.c.unsubscribe(t.name());
+						obj.c.unsubscribe(obj.selectedTopics.get(i));
 					} catch (Exception e2) {
 						e2.printStackTrace();
 					}
+
 				}
+                
                 //e' andato a buon fine e apriro' il form successivo
                 new LoginJFrame(null);
             }
