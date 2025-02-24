@@ -80,7 +80,7 @@ public class ActionSubscriber implements ActionListener, KeyListener {
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		String selectedTopic = obj.topics.getSelectedItem(); /*getSelectedItem(): restituisce l'elemento selezionato*/
+		// String selectedTopic = obj.topics.getSelectedItem(); /*getSelectedItem(): restituisce l'elemento selezionato*/
 		
 		
 		/*CONDIZIONE DUE: l'utente preme il bottone 'INVIA', quindi riguarda il 2° controllo dell'if() che permette di inviare e pubblicare 
@@ -105,7 +105,10 @@ public class ActionSubscriber implements ActionListener, KeyListener {
 				if(!obj.c.isConnected()) {
 					obj.c.connect(opts);
 				}
-				obj.c.publish(selectedTopic, msg);
+				//mando messaggi a tutti i topic selezionati
+				for(int i=0;i< obj.selectedTopics.size();i++) {
+					obj.c.publish(obj.selectedTopics.get(i), msg);
+				}
 											
 				
 				obj.textToSend.setText(null);//pulisco dopo aver pubblicato sulla coda

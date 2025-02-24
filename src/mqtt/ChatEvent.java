@@ -31,6 +31,7 @@ public class ChatEvent extends JFrame {
 	public TextArea messagesReceived;
 	public TextArea textToSend;
 	public Choice topics; /*Choice: presenta un menu a tendina*/
+	public ArrayList<String> selectedTopics = new ArrayList<String>();
 	/*MqttClient: contiene la parte logica del protocollo per connettersi e comunicare al broker mqtt 
 	  cio� all'indirizzo 'tcp://127.0.0.1:1883'. 
 	  127.0.0.1: e' l'indirizzo locale della macchina; mentre 1883 � la porta*/
@@ -91,14 +92,15 @@ public class ChatEvent extends JFrame {
 		//messagesReceived.addKeyListener(s);
 		add(messagesReceived);
 		
-		
-		topics = new Choice();
-		topics.setBounds(10,360,100,30);/*setBounds(x,y,width,height): specifica la posizione e le dimensioni di un componente GUI, coordinate x,y*/
-		add(topics);
-		for(Topic t : Topic.values()) {
-			//System.out.println(t);
-			topics.add(t.name());
-		}
+		//AGGIUNGERE questo se si vuole mandare messaggi solo una per TOPIC (servira' cambiare action subscriber)
+		// topics = new Choice();
+		// topics.setBounds(10,360,100,30);/*setBounds(x,y,width,height): specifica la posizione e le dimensioni di un componente GUI, coordinate x,y*/
+		// add(topics);
+		// for(Topic t : Topic.values()) {
+		// 	//System.out.println(t);
+		// 	topics.add(t.name());
+		// }
+
 		//PULSANTE INVIA
 		sendButton = new Button("Invia");
 		sendButton.setBounds(150,360,80,30);/*setBounds(x,y,width,height): specifica la posizione e le dimensioni di un componente GUI, coordinate x,y*/
@@ -121,6 +123,7 @@ public class ChatEvent extends JFrame {
 		MultiSelectComboBox();
 	}
 
+	// Metodo per far comparire la select multipla (utilizza un Jpopup menu)
 	public void MultiSelectComboBox() {
        
         ArrayList<JCheckBox> checkBoxes = new ArrayList<JCheckBox>();
@@ -138,12 +141,16 @@ public class ChatEvent extends JFrame {
 					System.out.println(checkBox.getText() + " selezionato");
 					try {
 						c.subscribe(checkBox.getText());
+						// aggiungo in una variabile di topic selezionati
+						selectedTopics.add(checkBox.getText());
 					} catch (MqttException e) {
 						e.printStackTrace();
 					}
 				} else {
 					try {
 						c.unsubscribe(checkBox.getText());
+						// rimuovo da variabile di topic selezionati la coda deselezionata
+						selectedTopics.remove(checkBox.getText());
 					} catch (MqttException e) {
 						e.printStackTrace();
 					}
@@ -152,7 +159,6 @@ public class ChatEvent extends JFrame {
         }
         // Fake combo box (just for display)
 		JComboBox comboBox = new JComboBox<>(new String[]{"Seleziona"});
-        // comboBox.setPrototypeDisplayValue("Select Multiple...");
         
         // apro il popup quando click sulla combobox
         comboBox.addActionListener(e -> {
